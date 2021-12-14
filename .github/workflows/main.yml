@@ -33,3 +33,5 @@ jobs:
             - name: KIMlib
             - name: AM232X
             - name: EmonLib
+            - name: SimpleCLI
+            - name: IRremote
