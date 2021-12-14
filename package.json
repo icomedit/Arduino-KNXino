@@ -7,7 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "Arduino-IRremote": "^3.5.0",
-    "Arduino-KIMlib": "^0.9.0",
+    "@icomedit/Arduino-KIMlib": "^0.9.0",
     "Arduino-AM232X": "^0.3.3",
     "Arduino-SimpleCLI": "^1.1.3",
     "Arduino-EmonLib": "^1.1.0"
