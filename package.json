@@ -1,0 +1,15 @@
+{
+  "name": "KNXino",
+  "version": "0.0.1",
+  "private": false,
+  "description": "KNXino shield for Arduino",
+  "author": "Fabio Di Michele",
+  "license": "MIT",
+  "dependencies": {
+    "IRremote": "^3.5.0",
+    "KIMlib": "^0.9.0",
+    "AM232X": "^0.3.3",
+    "SimpleCLI": "^1.1.3",
+    "EmonLib": "^1.1.0"
+  }
+}
