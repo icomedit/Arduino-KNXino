@@ -1,7 +1,11 @@
 # Arduino-KNXino
 KIMaip KNX / EIB Shield Arduino for gateway KONNEX
 
-You can find the complete manual in the doc folder
+This is setup for test:
+
+![](https://github.com/icomedit/Arduino-KNXino/blob/master/doc/IMG_ON.jpg?raw=true)
+
+You can find the complete manual in the doc folder.
 
 In the KIMlib library, there is an ETS (V5) file that contains the KIMaip device to copy and use in your project. The ETS file is the same one used to load the DEMO application used to make the examples contained in the library work. The device present in it must be configured according to the needs of your project:
 
