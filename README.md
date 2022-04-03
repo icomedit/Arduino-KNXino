@@ -11,8 +11,12 @@ In the KIMlib library, there is an ETS (V5) file that contains the KIMaip device
 
 You can buy KIMaip KNX / EIB shield for your experiment whit Arduino.
 
-Full version: https://www.ebay.it/itm/324815210159
+![](https://i.ebayimg.com/images/g/1AMAAOSwpEZhXAJt/s-l500.jpg)
 
-Light version: https://www.ebay.it/itm/324939880226
+[Full version buy now](https://www.ebay.it/itm/324815210159)
+
+![](https://i.ebayimg.com/images/g/9xUAAOSwE9hhZY8n/s-l500.jpg)
+
+[Light version buy now](https://www.ebay.it/itm/324939880226)
 
 Enjoy. :-)
