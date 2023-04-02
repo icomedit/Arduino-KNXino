@@ -90,8 +90,8 @@ void setup() {
   printUserParameter();
 #endif
 
-  IrReceiver.begin(IR_RECEIVE_PIN);  // Start the receiver
-  IrSender.begin(IR_SEND_PIN);
+  //IrReceiver.begin(IR_RECEIVE_PIN);  // Start the receiver
+  //IrSender.begin(IR_SEND_PIN);
 
   if (! AM2322.begin() )
   {

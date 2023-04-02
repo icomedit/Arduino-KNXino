@@ -28,7 +28,7 @@
 //------------------------------------------------------------------------------
 // Include the IRremote library header
 //
-#include <IRremote.h>
+//#include <IRremote.h>
 
 #include "SkElapsedTime.h" 
 #include "MedUtils.h"
@@ -76,7 +76,7 @@
 #define WAIT              10     // Attesa tra tra le letture e scritture su KIM
 
 // Debug flag da commentare per firmware di produzione
-#define   _PLOT
+//#define   _PLOT
 //#define   _DEBUG_EMON
 
 //+=============================================================================
@@ -122,6 +122,7 @@ struct config_t
 } configuration;
 
 // Storage for the recorded code
+/* Out of memory in Arduino UNO
 struct storedIRDataStruct {
     IRData receivedIRData;
     uint8_t rawCode[RAW_BUFFER_LENGTH]; // The durations if raw
@@ -130,7 +131,7 @@ struct storedIRDataStruct {
 
 void storeCode(IRData *aIRReceivedData);
 void sendCode(storedIRDataStruct *aIRDataToSend);
-
+*/
 String inputStr = "";
 
 bool boolRele1 = false;
@@ -189,13 +190,13 @@ static String priorityMode(byte mode)
 {
   switch (mode) {
     case 0:           
-        return "ETS";
+        return F("ETS");
         break;
     case 1:           
-        return "I2C";
+        return F("I2C");
         break;
     case 2:           
-        return "Default";
+        return F("Default");
         break;
   } 
 }
@@ -203,46 +204,46 @@ static String priorityMode(byte mode)
 static String sino(byte mode)
 {
   if (mode == 0) 
-    return "NO";
+    return F("NO");
   else     
-    return "SI";
+    return F("SI");
 }
 
 static String printObj(unsigned int id)
 {
   switch (id) {
     case OBJ_BUTTON:           
-        return "Button";
+        return F("Button");
         break;
     case OBJ_VRMS:           
-        return "Voltage RMS";
+        return F("Voltage RMS");
         break;
     case OBJ_IRMS:           
-        return "Current RMS";
+        return F("Current RMS");
         break;
     case OBJ_CTEMP:           
-        return "Tempereature";
+        return F("Tempereature");
         break;
     case OBJ_UMIDITY:           
-        return "Umidity";
+        return F("Umidity");
         break;
     case OBJ_RELE1:           
-        return "Rele 1";
+        return F("Rele 1");
         break;
     case OBJ_RELE2:           
-        return "Rele 2";
+        return F("Rele 2");
         break;
     case OBJ_RELE3:           
-        return "Rele 3";
+        return F("Rele 3");
         break;
     case OBJ_RELE4:           
-        return "Rele 4";
+        return F("Rele 4");
         break;
     case OBJ_LED:           
-        return "Led";
+        return F("Led");
         break;
     case OBJ_TERM:           
-        return "Termostato";
+        return F("Termostato");
         break;
   } 
 }
@@ -261,17 +262,14 @@ void pulsanteSet() {
 #ifdef _DEBUG        
         Serial.println(F("Button released"));
 #endif
-        IrReceiver.start();
+        //IrReceiver.start();
     }
 
     /*
-     * Check for static button state
-     */
+    // Check for static button state
     if (buttonState == LOW) {
         IrReceiver.stop();
-        /*
-         * Button pressed send stored data or repeat
-         */
+        // Button pressed send stored data or repeat
 #ifdef _DEBUG         
         Serial.println(F("Button pressed, now sending"));
 #endif
@@ -280,19 +278,18 @@ void pulsanteSet() {
         }
         sendCode(&sStoredIRData);
 
-        /*
-         * Button is not pressed, check for incoming data
-         */
+    // Button is not pressed, check for incoming data
     } else if (IrReceiver.available()) {
         storeCode(IrReceiver.read());
         IrReceiver.resume(); // resume receiver
     }
-
     setButtonToggle.setState(buttonState);
+*/    
 }
 
 // Stores the code for later playback in sStoredIRData
 // Most of this code is just logging
+/*
 void storeCode(IRData *aIRReceivedData) {
     if (aIRReceivedData->flags & IRDATA_FLAGS_IS_REPEAT) {
 #ifdef _DEBUG       
@@ -312,9 +309,8 @@ void storeCode(IRData *aIRReceivedData) {
 #endif        
         return;
     }
-    /*
-     * Copy decoded data
-     */
+
+    // Copy decoded data
     sStoredIRData.receivedIRData = *aIRReceivedData;
 
     if (sStoredIRData.receivedIRData.protocol == UNKNOWN) {
@@ -324,9 +320,7 @@ void storeCode(IRData *aIRReceivedData) {
         Serial.println(F(" TickCounts as raw "));
 #endif         
         sStoredIRData.rawCodeLength = IrReceiver.decodedIRData.rawDataPtr->rawlen - 1;
-        /*
-         * Store the current raw data in a dedicated array for later usage
-         */
+        // Store the current raw data in a dedicated array for later usage
         IrReceiver.compensateAndStoreIRResultInArray(sStoredIRData.rawCode);
     } else {
 #ifdef _DEBUG      
@@ -337,7 +331,7 @@ void storeCode(IRData *aIRReceivedData) {
 }
 
 void sendCode(storedIRDataStruct *aIRDataToSend) {
-    if (aIRDataToSend->receivedIRData.protocol == UNKNOWN /* i.e. raw */) {
+    if (aIRDataToSend->receivedIRData.protocol == UNKNOWN) {
         // Assume 38 KHz
         IrSender.sendRaw(aIRDataToSend->rawCode, aIRDataToSend->rawCodeLength, 38);
 #ifdef _DEBUG
@@ -353,6 +347,7 @@ void sendCode(storedIRDataStruct *aIRDataToSend) {
 #endif        
     }
 }
+*/
 
 void listI2Cdevices() {
   byte err, address;
