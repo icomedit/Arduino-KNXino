@@ -33,7 +33,9 @@
 #include "SkElapsedTime.h" 
 #include "MedUtils.h"
 
+// Wired connections
 #define SEND_BUTTON_PIN   A1    // Pulsante di servizio
+#define NO_LED_FEEDBACK_CODE    // Disable feedback led
 #define EXT_TV            A2    // Rilevazione di tensione
 #define EXT_TA            A3    // Rilevazione di corrente
 #define KNX_DATAREADY     2     // Pin 1 Gateway KNX
@@ -65,10 +67,12 @@
 #define STAT_RELE3    15
 #define STAT_RELE4    16
 
+// Calibration
 #define TA_CALIBRATION   4.9    // SCT013 5A/1V
 #define TV_CALIBRATION   137.03 // TV homemade
 #define SERIAL_BIT_RATE  115200 // Velocità della seriale
 
+// Costnati
 #define WAIT              10     // Attesa tra tra le letture e scritture su KIM
 
 // Debug flag da commentare per firmware di produzione
