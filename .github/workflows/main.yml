@@ -24,7 +24,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-      - uses: arduino/compile-sketches@v1.0.1
+      - uses: arduino/compile-sketches@v1.1.0
         with:
           fqbn: 'arduino:avr:uno'
           sketch-paths: |
