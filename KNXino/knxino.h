@@ -23,12 +23,6 @@
  **/
  
 #include <Wire.h>
-#include <SimpleCLI.h>
-
-//------------------------------------------------------------------------------
-// Include the IRremote library header
-//
-//#include <IRremote.h>
 
 #include "SkElapsedTime.h" 
 #include "MedUtils.h"
@@ -75,9 +69,23 @@
 // Costnati
 #define WAIT              10     // Attesa tra tra le letture e scritture su KIM
 
+// Features
+#define ENABLE_IRR
+#define ENABLE_CLI
+
+//------------------------------------------------------------------------------
+// Include the IRremote library header
+//
+#ifdef ENABLE_IRR
+  #include <IRremote.h>
+#endif
+#ifdef ENABLE_CLI
+  #include <SimpleCLI.h>
 // Debug flag da commentare per firmware di produzione
 //#define   _PLOT
-//#define   _DEBUG_EMON
+//#define   _DEBUG
+//#define   _DEBUG_LIB  
+#endif
 
 //+=============================================================================
 // Initzialization global objects
@@ -103,12 +111,15 @@ Toggle testButtonToggle;
 Toggle setButtonToggle;
 
 // Create CLI Object
+#ifdef ENABLE_CLI
 SimpleCLI cli;
 Command cmdScan;
 Command cmdEnv;
 Command cmdShow;
 Command cmdHelp;
+#endif
 
+// Defalut configuration paramiter
 struct config_t
 {
   int intervallo = 10000;
@@ -121,23 +132,25 @@ struct config_t
   float mode = 0;
 } configuration;
 
-// Storage for the recorded code
-/* Out of memory in Arduino UNO
-struct storedIRDataStruct {
-    IRData receivedIRData;
-    uint8_t rawCode[RAW_BUFFER_LENGTH]; // The durations if raw
-    uint8_t rawCodeLength; // The length of the code
-} sStoredIRData;
-
-void storeCode(IRData *aIRReceivedData);
-void sendCode(storedIRDataStruct *aIRDataToSend);
-*/
-String inputStr = "";
-
 bool boolRele1 = false;
 bool boolRele2 = false;
 bool boolRele3 = false;
 bool boolRele4 = false;
+
+// Storage for the recorded code
+#ifdef ENABLE_IRR
+  struct storedIRDataStruct {
+    IRData receivedIRData;
+    uint8_t rawCode[RAW_BUFFER_LENGTH]; // The durations if raw
+    uint8_t rawCodeLength; // The length of the code
+  } sStoredIRData;
+
+  void storeCode(IRData *aIRReceivedData);
+  void sendCode(storedIRDataStruct *aIRDataToSend);
+#endif
+#ifdef ENABLE_CLI
+  String inputStr = "";
+#endif
   
 void onBuzzer()
 {
@@ -162,6 +175,7 @@ void toneBuzzer(unsigned int duration, unsigned int repite)
   }
 }
 
+#ifdef ENABLE_CLI
 void ttySerial() {
   if (Serial.available()) {    
     char c = Serial.read();
@@ -169,10 +183,10 @@ void ttySerial() {
     {  
       if (inputStr.length() > 0)
       {
-#ifdef _DEBUG
+  #ifdef _DEBUG
           Serial.print(F("> "));
           Serial.println(inputStr);
-#endif        
+  #endif        
         cli.parse(inputStr); 
         inputStr = ""; 
       }      
@@ -247,7 +261,7 @@ static String printObj(unsigned int id)
         break;
   } 
 }
-
+#endif
 // IR TX e RX con IRemote
 void pulsanteSet() {
 
@@ -262,10 +276,11 @@ void pulsanteSet() {
 #ifdef _DEBUG        
         Serial.println(F("Button released"));
 #endif
-        //IrReceiver.start();
+#ifdef ENABLE_IRR
+        IrReceiver.start();
+#endif  
     }
-
-    /*
+#ifdef ENABLE_IRR
     // Check for static button state
     if (buttonState == LOW) {
         IrReceiver.stop();
@@ -283,30 +298,30 @@ void pulsanteSet() {
         storeCode(IrReceiver.read());
         IrReceiver.resume(); // resume receiver
     }
-    setButtonToggle.setState(buttonState);
-*/    
+    setButtonToggle.setState(buttonState);  
+#endif 
 }
 
 // Stores the code for later playback in sStoredIRData
 // Most of this code is just logging
-/*
+#ifdef ENABLE_IRR
 void storeCode(IRData *aIRReceivedData) {
     if (aIRReceivedData->flags & IRDATA_FLAGS_IS_REPEAT) {
-#ifdef _DEBUG       
+  #ifdef _DEBUG       
         Serial.println(F("Ignore repeat"));
-#endif        
+  #endif        
         return;
     }
     if (aIRReceivedData->flags & IRDATA_FLAGS_IS_AUTO_REPEAT) {
-#ifdef _DEBUG         
+  #ifdef _DEBUG         
         Serial.println(F("Ignore autorepeat"));
-#endif        
+  #endif        
         return;
     }
     if (aIRReceivedData->flags & IRDATA_FLAGS_PARITY_FAILED) {
-#ifdef _DEBUG         
+  #ifdef _DEBUG         
         Serial.println(F("Ignore parity error"));
-#endif        
+  #endif        
         return;
     }
 
@@ -314,18 +329,18 @@ void storeCode(IRData *aIRReceivedData) {
     sStoredIRData.receivedIRData = *aIRReceivedData;
 
     if (sStoredIRData.receivedIRData.protocol == UNKNOWN) {
-#ifdef _DEBUG 
+  #ifdef _DEBUG 
         Serial.print(F("Received unknown code saving "));
         Serial.print(IrReceiver.decodedIRData.rawDataPtr->rawlen - 1);
         Serial.println(F(" TickCounts as raw "));
-#endif         
+  #endif         
         sStoredIRData.rawCodeLength = IrReceiver.decodedIRData.rawDataPtr->rawlen - 1;
         // Store the current raw data in a dedicated array for later usage
         IrReceiver.compensateAndStoreIRResultInArray(sStoredIRData.rawCode);
     } else {
-#ifdef _DEBUG      
+  #ifdef _DEBUG      
         IrReceiver.printIRResultShort(&Serial);
-#endif   
+  #endif   
         sStoredIRData.receivedIRData.flags = 0; // clear flags -esp. repeat- for later sending     
     }
 }
@@ -334,27 +349,26 @@ void sendCode(storedIRDataStruct *aIRDataToSend) {
     if (aIRDataToSend->receivedIRData.protocol == UNKNOWN) {
         // Assume 38 KHz
         IrSender.sendRaw(aIRDataToSend->rawCode, aIRDataToSend->rawCodeLength, 38);
-#ifdef _DEBUG
+  #ifdef _DEBUG
         Serial.print(F("Sent raw "));
         Serial.print(aIRDataToSend->rawCodeLength);
         Serial.println(F(" marks or spaces"));
-#endif
+  #endif
     } else {
         IrSender.write(&aIRDataToSend->receivedIRData, NO_REPEATS);
-#ifdef _DEBUG_MEGA
+  #ifdef _DEBUG_MEGA
         Serial.print(F("Sent: "));
         IrReceiver.printIRResultShort(&Serial); //, &aIRDataToSend->receivedIRData);
-#endif        
+  #endif        
     }
 }
-*/
-
+#endif 
+#ifdef ENABLE_CLI
 void listI2Cdevices() {
   byte err, address;
   int nDevices;
 
   //Serial.println(F("Scanning..."));
-
   nDevices = 0;
   for(address = 1; address < 127; address++ ) 
   {
@@ -385,6 +399,6 @@ void listI2Cdevices() {
     Serial.println(F("No I2C devices found."));
   else
     //Serial.println(F("done."));
-
   Serial.flush();
 }
+#endif

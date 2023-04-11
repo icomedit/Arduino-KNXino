@@ -89,10 +89,10 @@ void setup() {
   printSystemParameter();
   printUserParameter();
 #endif
-
-  //IrReceiver.begin(IR_RECEIVE_PIN);  // Start the receiver
-  //IrSender.begin(IR_SEND_PIN);
-
+#ifdef ENABLE_IRR
+  IrReceiver.begin(IR_RECEIVE_PIN);  // Start the receiver
+  IrSender.begin(IR_SEND_PIN);
+#endif
   if (! AM2322.begin() )
   {
     toneBuzzer(500, 3);
@@ -100,7 +100,7 @@ void setup() {
     Serial.println(F("Sensor HT not found"));
 #endif
   }
-
+#ifdef ENABLE_CLI
   cmdScan = cli.addCmd("lsi2c");
   cmdScan.setDescription("Scanning available I2C devices.");
   cmdEnv = cli.addCmd("env");
@@ -108,11 +108,10 @@ void setup() {
   cmdShow = cli.addCmd("show");
   cmdShow.setDescription("List of user parameters");
   cmdHelp = cli.addCommand("help");
-
+#endif
 #ifdef _PLOT
   Serial.println(F("\rIrms\tVrms\tHUMI\tTEMP"));
 #endif
-
   chronoPulsanteTest.start();
   chronoPulsanteSet.start();
   onBuzzer();
@@ -124,12 +123,12 @@ void loop() {
   checkBuzzer(500);
 
   // Input command via serial monitor
+#ifdef ENABLE_CLI
   ttySerial();
   ttySelectCmd();
-  
+#endif  
   // put your main code here, to run repeatedly:
   if (knxIno.recive()) {
-
 #ifdef _DEBUG
     systemEvent(knxIno.getSystemEvent());
     delay(WAIT);
@@ -237,7 +236,7 @@ void readPowerMeter()
   if (isChangedVrms.isTolleranceChanged(configuration.tolleranza))
     tensione.setValue(Vrms);
 }
-
+#ifdef ENABLE_CLI
 void printSystemParameter() {
   //do something when var equals 0001h
   Serial.print(F("Version: "));
@@ -328,7 +327,8 @@ void printSystemParameter() {
   delay(WAIT);
   Serial.flush();
 }
-
+#endif
+#ifdef ENABLE_CLI
 void systemEvent(unsigned long sysEvent)
 {
   union l_tag {                             // Siccome la temperatura è un dato FLOAT, si usa la funzione Union per "spacchettare" i 4 BYTE che la compongono.
@@ -339,16 +339,17 @@ void systemEvent(unsigned long sysEvent)
   unsigned int idEvent = l.temp_int[1];
   unsigned int objN = l.temp_int[0];
 
-#ifdef _DEBUG_LIB
+  #ifdef _DEBUG_LIB
   Serial.print(F("Sytem Event: 0x"));
   Serial.println(l.temp_long, HEX);
-#endif
-#ifdef _DEBUG
+  #endif
+  #ifdef _DEBUG
   Serial.print(printObj(objN));
-  Serial.println(printIdEvent(idEvent));
-#endif
+  //Serial.println(printIdEvent(idEvent));
+  #endif
 }
-
+#endif
+#ifdef ENABLE_CLI
 void ttySelectCmd() {
   // Interpetre dei comandi
   if (cli.available()) {
@@ -367,7 +368,8 @@ void ttySelectCmd() {
     }
   }
 }
-
+#endif
+#ifdef ENABLE_CLI
 void printUserParameter()
 {
   Serial.print(F("Serial bit rate: "));
@@ -396,7 +398,7 @@ void printUserParameter()
   Serial.print(configuration.isteresi, 1);
   Serial.println(F(" *C"));
 }
-
+#endif
 void allingeUserParameter()
 {
   configuration.serialBitRate = ((long)kBitRate.getValue() * 1000) + (long)cBitRate.getValue();
